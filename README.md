@@ -1,5 +1,5 @@
-GSCam [![Build Status](https://travis-ci.org/ros-drivers/gscam.svg?branch=master)](https://travis-ci.org/ros-drivers/gscam)
-===========================================================================================================================
+GSCam
+=====
 
 This is a ROS package originally developed by the [Brown Robotics
 Lab](http://robotics.cs.brown.edu/) for broadcasting any

@@ -14,7 +14,7 @@ extern "C"{
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/SetCameraInfo.h>
-
+#include <boost/scoped_ptr.hpp>
 #include <stdexcept>
 
 namespace gscam {
