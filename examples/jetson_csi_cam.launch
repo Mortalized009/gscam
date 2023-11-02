@@ -2,11 +2,15 @@
   <!-- Command Line Arguments -->
   <arg name="sensor_id" default="0" />                       <!-- The sensor id of the camera -->
   <arg name="cam_name" default="camera_$(arg sensor_id)" /> <!-- The name of the camera (corrsponding to the camera info) -->
-  <arg name="frame_id" default="/$(arg cam_name)_link" />    <!-- The TF frame ID. -->
+  <arg name="frame_id" default="/$(arg cam_name)_down_link" />    <!-- The TF frame ID. -->
   <arg name="sync_sink" default="true" />                    <!-- Synchronize the app sink. Setting this to false may resolve problems with sub-par framerates. -->
   <arg name="width" default="1920" />                        <!-- Image Width -->
   <arg name="height" default="1080" />                       <!-- Image Height -->
   <arg name="fps" default="30" />                            <!-- Desired framerate. True framerate may not reach this if set too high. -->
+  <arg name="camera_offset_X" default="0.15" />              <!-- Camera Offset in X from markers centre -->
+  <arg name="camera_offset_Y" default="0" />                 <!-- Camera Offset in Y from markers centre -->
+  <arg name="camera_offset_Z" default="-0.165" />              <!-- Camera Offset in Z from markers centre -->
+  <arg name="drone_base" default="/Ed1" />                <!-- /vicon Using Vicon TF as the Drone Base (drone_base) -->
 
   <!-- Make arguments available to parameter server -->
   <param name="$(arg cam_name)/camera_id" type="int" value="$(arg sensor_id)" />
@@ -19,8 +23,8 @@
   <!-- Define the GSCAM pipeline -->
   <!--env name="GSCAM_CONFIG" value="nvarguscamerasrc sensor-id=$(arg sensor_id) ! video/x-raw(memory:NVMM),
     width=(int)$(arg width), height=(int)$(arg height), format=(string)I420, framerate=(fraction)$(arg fps)/1 ! 
-    nvvidconv flip-method=2 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR" /-->
-  <env name="GSCAM_CONFIG" value="nvarguscamerasrc sensor-id=$(arg sensor_id) ! video/x-raw(memory:NVMM), width=(int)$(arg width), height=(int)$(arg height), format=(string)NV12, framerate=(fraction)$(arg fps)/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert" />
+    nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR" /-->
+  <env name="GSCAM_CONFIG" value="nvarguscamerasrc sensor-id=$(arg sensor_id) ! video/x-raw(memory:NVMM), width=(int)$(arg width), height=(int)$(arg height), format=(string)NV12, framerate=(fraction)$(arg fps)/1 ! nvvidconv flip-method=2 ! video/x-raw, format=(string)BGRx ! videoconvert" />
 
   <!-- Start the GSCAM node -->
   <node pkg="gscam" type="gscam" name="$(arg cam_name)">
@@ -30,4 +34,10 @@
     <remap from="camera/image_raw" to="$(arg cam_name)/image_raw" />
     <remap from="/set_camera_info" to="$(arg cam_name)/set_camera_info" />
   </node>
+
+
+  <!-- Set up TF node for camera -->
+  <!--node pkg="tf" type="static_transform_publisher" name="tf_local_origin" args="0.1 0 0.1 0 0 0 /map /drone_base 100" /-->
+  <node pkg="tf" type="static_transform_publisher" name="downward_camera_broadcaster" args="$(arg camera_offset_X) $(arg camera_offset_Y) $(arg camera_offset_Z) -1.570796325 0 3.14159265 $(arg drone_base) $(arg frame_id) 100" />
+
 </launch>
